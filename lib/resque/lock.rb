@@ -2,7 +2,7 @@ module Resque
   module Lock
     
     def lock(*args)
-      "lock:#{name}-#{args.to_s}"
+      "lock:#{self.class.name}-#{args.to_s}"
     end
     
     def locked?(*args)
