@@ -1,26 +1,27 @@
 module Resque
   module Lock
     
-    def lock(*args)
-      "lock:#{self.class.name}-#{args.to_s}"
+    def lock_key( options = {} )
+      "lock:#{self.class.name}-#{options.keys.map(&:to_s).sort.join("|")}-#{options.values.map(&:to_s).sort.join("|")}"
     end
     
-    def locked?(*args)
-      Resque.redis.exists(lock(*args))
+    def locked?( options )
+      Resque.redis.exists( lock_key( options ) )
+    end
+    
+    def lock_uuid( options )
+      Resque.redis.get( lock_key( options ) )
     end
     
     # Where the magic happens.
-    def around_perform_lock(*args)
-      # Abort if another job has created a lock.
-      return unless Resque.redis.setnx(lock(*args), true)
-
-      begin
-        yield
-      ensure
-        # Always clear the lock when we're done, even if there is an
-        # error.
-        Resque.redis.del(lock(*args))
+    def self.enqueue(klass, options = {})
+      # Abort if another job added.
+      uuid = lock_uuid( options )
+      if uuid.blank?
+        uuid = super(klass, options = {})
+        Resque.redis.set( lock_key( options ), uuid )
       end
+      uuid
     end  
   end
 end

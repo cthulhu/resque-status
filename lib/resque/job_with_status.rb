@@ -39,6 +39,7 @@ module Resque
     def self.queue
       :statused
     end
+    
 
     # used when displaying the Job in the resque-web UI and identifiyng the job
     # type by status. By default this is the name of the job class, but can be
