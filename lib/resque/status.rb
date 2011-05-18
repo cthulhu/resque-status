@@ -180,8 +180,7 @@ module Resque
       super nil
       base_status = {
         'time' => Time.now.to_i,
-        'status' => 'queued',
-        'name'   => "#{self[:klass]}(#{self[:options].inspect unless self[:options].empty?})"
+        'status' => 'queued'
       }
       base_status['uuid'] = args.shift if args.length > 1
       status_hash = args.inject(base_status) do |final, m|
