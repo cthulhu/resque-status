@@ -28,9 +28,9 @@ module Resque
       if uuid.blank?
         uuid = super(klass, options)
         Resque.redis.set( lock_key( options ), uuid )
-        puts extra_locks_list_options( options ).inpsect
+        puts extra_locks_list_options( options ).inspect
         extra_locks_list_options( options ).each do | extra_lock_opts |
-          puts extra_locks_list_options( extra_lock_opts ).inpsect
+          puts extra_locks_list_options( extra_lock_opts ).inspect
           Resque.redis.set( lock_key( extra_lock_opts ), uuid )
         end
       end
