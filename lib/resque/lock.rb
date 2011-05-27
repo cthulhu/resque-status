@@ -5,8 +5,12 @@ module Resque
       "lock:#{self.name}-#{options.keys.map(&:to_s).sort.join("|")}-#{options.values.map(&:to_s).sort.join("|")}"
     end
     
-    def extra_locks_list_options options = {}
-      []
+    def _extra_locks_list_options options = {}
+      if self.respond_to? :extra_locks_list_options
+        self.send :extra_locks_list_options, options
+      else
+        [] 
+      end
     end
     
     def locked?( options )
@@ -28,9 +32,9 @@ module Resque
       if uuid.blank?
         uuid = super(klass, options)
         Resque.redis.set( lock_key( options ), uuid )
-        puts extra_locks_list_options( options ).inspect
-        extra_locks_list_options( options ).each do | extra_lock_opts |
-          puts extra_locks_list_options( extra_lock_opts ).inspect
+        puts _extra_locks_list_options( options ).inspect
+        _extra_locks_list_options( options ).each do | extra_lock_opts |
+          puts extra_lock_opts.inspect
           Resque.redis.set( lock_key( extra_lock_opts ), uuid )
         end
       end
@@ -42,7 +46,7 @@ module Resque
         yield
       ensure
         unlock_uuid( args[1] )
-        extra_locks_list_options( args[1] ).each do | extra_lock_opts |
+        _extra_locks_list_options( args[1] ).each do | extra_lock_opts |
           unlock_uuid( extra_lock_opts )
         end        
       end
