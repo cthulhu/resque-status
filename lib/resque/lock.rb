@@ -6,7 +6,7 @@ module Resque
   module Lock
     
     def lock_key( options = {} )
-      klass = options.delete(:klass) || self.name
+      klass = options.delete("klass") || self.name
       "lock:#{klass}-#{options.keys.map(&:to_s).sort.join("|")}-#{options.values.map(&:to_s).sort.join("|")}"
     end
     
