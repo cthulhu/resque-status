@@ -79,9 +79,14 @@ module Resque
       begin
         yield
       ensure
-        unlock_uuid( args[1] )
-        unlock_same_jobs( args[1] )
-        unlock_different_jobs( args[1] )
+        begin
+          unlock_same_jobs( args[1] )
+          unlock_different_jobs( args[1] )
+          unlock_uuid( args[1] )
+        rescue => e
+          puts e.to_s
+          puts e.backtrace.join("\n")
+        end
       end
     end
   end
