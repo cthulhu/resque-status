@@ -39,14 +39,14 @@ module Resque
     end
     
     def lock_different_jobs uuid, options
-      _extra_locks_jobs_list_options.each do | extra_lock_jobs_opts |
+      _extra_locks_jobs_list_options( options ).each do | extra_lock_jobs_opts |
         Resque.redis.set( lock_key( extra_lock_jobs_opts ), uuid )
       end
     end
     
     def unlock_different_jobs options
-      _extra_locks_jobs_list_options.each do | extra_lock_jobs_opts |
-        unlock_uuid( extra_lock_opts )
+      _extra_locks_jobs_list_options( options ).each do | extra_lock_jobs_opts |
+        unlock_uuid( extra_lock_jobs_opts )
       end
     end    
     
