@@ -70,7 +70,7 @@ module Resque
         uuid = super(klass, options)
         Resque.redis.set( lock_key( options ), uuid )
         lock_same_jobs uuid, options
-        lock_different_jobs options
+        lock_different_jobs uuid, options
       end
       uuid
     end  
