@@ -8,6 +8,7 @@ require 'mocha'
 
 require 'resque/status'
 require 'resque/job_with_status'
+require 'resque/lock'
 
 class Test::Unit::TestCase
 end
@@ -79,4 +80,39 @@ class KillableJob < Resque::JobWithStatus
     end
   end
 
+end
+
+class LockedJob < Resque::JobWithStatus
+  
+  def perform
+    total = options['num']
+    (1..total).each do |num|
+      at(num, total, "At #{num}")
+    end
+  end  
+  
+end
+
+class LockedKillableJob < Resque::JobWithStatus
+  
+  def perform
+    Resque.redis.set("#{uuid}:iterations", 0)
+    100.times do |num|
+      Resque.redis.incr("#{uuid}:iterations")
+      at(num, 100, "At #{num} of 100")
+    end
+  end  
+  
+end
+
+class LockedWithErrorJob < Resque::JobWithStatus
+  
+  def perform
+    Resque.redis.set("#{uuid}:iterations", 0)
+    100.times do |num|
+      Resque.redis.incr("#{uuid}:iterations")
+      at(num, 100, "At #{num} of 100")
+    end
+  end  
+  
 end
