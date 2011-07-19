@@ -8,12 +8,12 @@ module Resque
     # normal lock
     def lock_key( options = {} )
       klass = options.delete("klass") || self.name
-      "lock:#{klass}-#{options.to_a.sort_by(&:first).map{|a| a.join("=") }.join("|").to_s}"
+      "lock:#{klass}-#{options.to_a.sort_by(&:first).map{|a| a.join("=") }.join("|")}"
     end
     
     def competitive_lock_key( options = {} )
       klass = options.delete("klass") || self.name
-      "competitive-lock:#{klass}-#{options.to_a.sort_by(&:first).map{|a| a.join("=") }.join("|").to_s}"
+      "competitive-lock:#{klass}-#{options.to_a.sort_by(&:first).map{|a| a.join("=") }.join("|")}"
     end    
     
     def locked?( options )
