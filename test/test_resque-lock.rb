@@ -55,9 +55,13 @@ class TestResqueLock < Test::Unit::TestCase
         assert TestExtraLockedJob.locked_by_competitor?( :arrg2 => 1 )
         assert TestLockedJob.locked_by_competitor?( :arrg1 => 1 )
         assert TestLockedJob.locked_by_competitor?( :arrg2 => 1 )
+        assert !TestLockedJob.locked?( :arrg1 => 1 )
+        TestLockedJob.create( :arrg1 => 2 )
+        assert TestLockedJob.locked?( :arrg1 => 2 )
         $release_worker = true
         worker_thread.join
-        assert !TestLockedJob.locked?( @options )
+        assert !TestLockedJob.locked?( :arrg1 => 1 )
+        assert TestLockedJob.locked?( :arrg1 => 2 )
       end
     end
     context "on enqueue" do
