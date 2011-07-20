@@ -73,7 +73,8 @@ class TestResqueLock < Test::Unit::TestCase
 
         assert 0, TestLockedJob.competitive_lock_value( :arrg2 => 1 )
         assert 0, TestLockedJob.competitive_lock_value( :arrg1 => 1 )
-        
+        assert 0, TestExtraLockedJob.competitive_lock_value( :arrg1 => 1 )
+        assert 0, TestExtraLockedJob.competitive_lock_value( :arrg2 => 1 )
       end
     end
     context "on enqueue" do

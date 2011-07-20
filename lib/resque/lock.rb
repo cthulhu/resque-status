@@ -100,11 +100,13 @@ module Resque
     end
     def competitive_unlock( options )
       lock = Resque.redis.get( competitive_lock_key( options ) )
-      if lock == 1 
-        Resque.redis.del( competitive_lock_key( options ) )
-      else
-        Resque.redis.set( competitive_lock_key( options ), 
-          Resque.redis.get( competitive_lock_key( options ) ).to_i - 1 )
+      unless lock.nil?
+        if lock.to_i <= 1 
+          Resque.redis.del( competitive_lock_key( options ) )
+        else
+          Resque.redis.set( competitive_lock_key( options ), 
+            Resque.redis.get( competitive_lock_key( options ) ).to_i - 1 )
+        end
       end
     end
     def unlock( options )
