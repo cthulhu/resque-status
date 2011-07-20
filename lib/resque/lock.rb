@@ -47,10 +47,10 @@ module Resque
 
     def with_competitive_lock uuid, options
       _extra_locks_list_options( options ).each do | extra_lock_opts |
-        Resque.redis.set( competitive_lock_key( extra_lock_opts ), uuid )
+        competitive_lock( extra_lock_opts )
       end
       _extra_locks_jobs_list_options( options ).each do | extra_lock_jobs_opts |
-        Resque.redis.set( competitive_lock_key( extra_lock_jobs_opts ), uuid )
+        competitive_lock( extra_lock_jobs_opts )
       end
       begin
         yield
@@ -78,8 +78,12 @@ module Resque
     def around_perform_lock *args
       unless locked_by_competitor? args[1]
         uuid = lock_uuid( args[1] )
-        with_competitive_lock uuid, args[1] do
-          yield
+        begin 
+          with_competitive_lock uuid, args[1] do
+            yield
+          end
+        rescue => e
+          puts e.to_s
         end
         unlock( args[1] ) 
       else
@@ -87,9 +91,22 @@ module Resque
         Resque.enqueue(self, *args)
       end
     end
+    def competitive_lock_value( options )
+      Resque.redis.get( competitive_lock_key( options ) ).to_i
+    end
   protected
+    def competitive_lock( options )
+      Resque.redis.set( competitive_lock_key( options ), 
+        Resque.redis.get( competitive_lock_key( options ) ).to_i + 1 )
+    end
     def competitive_unlock( options )
-      Resque.redis.del( competitive_lock_key( options ) )
+      lock = Resque.redis.get( competitive_lock_key( options ) )
+      if lock == 1 
+        Resque.redis.del( competitive_lock_key( options ) )
+      else
+        Resque.redis.set( competitive_lock_key( options ), 
+          Resque.redis.get( competitive_lock_key( options ) ).to_i - 1 )
+      end
     end
     def unlock( options )
       Resque.redis.del( lock_key( options ) )
