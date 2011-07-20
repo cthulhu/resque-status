@@ -87,7 +87,6 @@ module Resque
         end
         unlock( args[1] ) 
       else
-        unlock( args[1] )
         Resque.enqueue(self, *args)
       end
     end
