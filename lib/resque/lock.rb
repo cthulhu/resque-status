@@ -6,13 +6,14 @@ module Resque
   module Lock
     
     # normal lock
-    def lock_key( options = {} )
+    def lock_key( opts = {} )
+      options = opts.dup
       klass = options.delete("klass") || self.name
       "lock:#{klass}-#{options.to_a.sort{|a,b| a[0].to_s <=> b[0].to_s }.map{|a| a.join("=") }.join("|")}"
     end
     
     def competitive_lock_key( options = {} )
-      "competitive-#{lock_key( options )}"
+      "competitive-#{lock_key( options.dup )}"
     end    
     
     def locked?( options )
