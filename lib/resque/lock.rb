@@ -28,7 +28,11 @@ module Resque
     
     def _extra_locks_list_options options = {}
       if self.respond_to? :extra_locks_list_options
-        self.send :extra_locks_list_options, options
+        begin
+          self.send :extra_locks_list_options, options
+        rescue
+          []
+        end
       else
         [] 
       end
@@ -36,7 +40,10 @@ module Resque
 
     def _extra_locks_jobs_list_options options = {}
       if self.respond_to? :extra_locks_jobs_list_options
-        self.send :extra_locks_jobs_list_options, options
+        begin      
+          self.send :extra_locks_jobs_list_options, options
+        rescue 
+        end
       else
         [] 
       end
