@@ -26,7 +26,7 @@
           <%= Resque::Status.get( Resque.redis.get( lock ) ).inspect %>  
         </td>
         <td>
-          <a href="<%= u(:statuses) %>/<%= ::CGI::escape(lock) %>/kill" class="kill">Unlock</a>
+          <a href="<%= u(:locks) %>/<%= ::CGI::escape(lock) %>/kill" class="kill">Unlock</a>
         </td>      
       </tr>      
     <% end %>
