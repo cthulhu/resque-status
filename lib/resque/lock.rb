@@ -91,7 +91,8 @@ module Resque
             yield
           end
         rescue => e
-          puts e.to_s
+          unlock( args[1] ) 
+          raise e
         end
         unlock( args[1] ) 
       else
